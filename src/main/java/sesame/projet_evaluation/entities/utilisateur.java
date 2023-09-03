@@ -6,10 +6,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 
 @Entity
@@ -34,6 +34,8 @@ public class utilisateur implements Serializable {
 //    @JsonIgnoreProperties({"user"})
 //    private Photo photo;
 
+    @ManyToOne
+    private Departement departement;
 
     //@NotBlank
     @Size(max = 20)
@@ -52,13 +54,6 @@ public class utilisateur implements Serializable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-
-
-
-
-
-
-
 
 
     public utilisateur() {
@@ -169,6 +164,14 @@ public class utilisateur implements Serializable {
 
     public void setActif(boolean actif) {
         this.actif = actif;
+    }
+
+    public Departement getDepartement() {
+        return departement;
+    }
+
+    public void setDepartement(Departement departement) {
+        this.departement = departement;
     }
 }
 

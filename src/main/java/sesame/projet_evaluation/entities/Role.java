@@ -1,7 +1,8 @@
 package sesame.projet_evaluation.entities;
 
-import jakarta.persistence.*;
 import sesame.projet_evaluation.utils.ERole;
+
+import javax.persistence.*;
 
 @Entity
 public class Role {
