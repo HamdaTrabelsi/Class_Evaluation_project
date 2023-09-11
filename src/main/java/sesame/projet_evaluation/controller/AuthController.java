@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import sesame.projet_evaluation.dto.UserDetailsImpl;
 import sesame.projet_evaluation.entities.Role;
-import sesame.projet_evaluation.entities.utilisateur;
+import sesame.projet_evaluation.entities.Utilisateur;
 import sesame.projet_evaluation.payload.request.LoginRequest;
 import sesame.projet_evaluation.payload.request.SignUpRequest;
 import sesame.projet_evaluation.payload.response.JwtResponse;
@@ -76,12 +76,6 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        /*if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
-        }*/
-
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
@@ -92,12 +86,27 @@ public class AuthController {
 
 
         // Create new user's account
-        utilisateur utilisateur = new utilisateur(
+        Utilisateur utilisateur = new Utilisateur(
                 signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                signUpRequest.getlastname(),
+                signUpRequest.getFirstname(),
+                signUpRequest.getLastname(),
+                signUpRequest.getIdentifiant(),
+                signUpRequest.getCodePostal(),
+                signUpRequest.getDescription(),
+                signUpRequest.getLinkedInUrl(),
+                signUpRequest.getAdresse(),
+                encoder.encode(signUpRequest.getPassword())
+                );
 
-                encoder.encode(signUpRequest.getPassword()));
+
+
+        if(signUpRequest.getDepartement() != null){
+            utilisateur.setDepartement(signUpRequest.getDepartement());
+        }
+        if(signUpRequest.getClasse() != null){
+            utilisateur.setClasse(signUpRequest.getClasse());
+        }
 
 
         Set<String> strRoles = signUpRequest.getRoles();
@@ -109,6 +118,7 @@ public class AuthController {
         userRepository.save(utilisateur);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
+
 
     public Set<Role> prepareRoles(Set<String> strRoles) {
         Set<Role> roles = new HashSet<>();

@@ -13,9 +13,8 @@ import javax.validation.constraints.Size;
 
 
 @Entity
-public class utilisateur implements Serializable {
+public class Utilisateur implements Serializable {
 
-    //private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +22,9 @@ public class utilisateur implements Serializable {
     private Long id;
 
     //@NotBlank
-    @Size(max = 20)
+    @Size(max = 50)
     private String username;
 
-    //@Email
     private String email;
 
 //    @OneToOne(cascade = CascadeType.ALL, orphanRemoval=true)
@@ -34,16 +32,34 @@ public class utilisateur implements Serializable {
 //    @JsonIgnoreProperties({"user"})
 //    private Photo photo;
 
-    @ManyToOne
+    @ManyToOne(optional = true)
+    @JoinColumn(columnDefinition="integer", name="departement_id")
     private Departement departement;
 
-    //@NotBlank
-    @Size(max = 20)
+    @ManyToOne(optional = true)
+    @JoinColumn(columnDefinition="integer", name="classe_id")
+    private Classe classe;
+
+    @Size(max = 50)
+    private String firstName;
+
+    @Size(max = 50)
     private String lastname;
+
+    private String identifiant;
+
+    private String codePostal;
+
+    private String description;
+
+    private String linkedInUrl;
 
     //@NotBlank
     @Size(max = 120)
     private String password;
+
+    @Size(max = 200)
+    private String adresse;
 
 
     private boolean actif;
@@ -56,58 +72,22 @@ public class utilisateur implements Serializable {
     private Set<Role> roles = new HashSet<>();
 
 
-    public utilisateur() {
+    public Utilisateur() {
         super();
     }
 
 
-
-
-    public utilisateur(@NotBlank @Size(max = 20) String username, @Email String email,
-                       @NotBlank @Size(max = 20) String lastname, @NotBlank @Size(max = 120) String password, boolean actif, Set<Role> roles) {
-        super();
+    public Utilisateur(String username, String email, String firstName, String lastname, String identifiant, String codePostal, String description, String linkedInUrl, String adresse, String password) {
         this.username = username;
         this.email = email;
+        this.firstName = firstName;
         this.lastname = lastname;
+        this.identifiant = identifiant;
+        this.codePostal = codePostal;
+        this.description = description;
+        this.linkedInUrl = linkedInUrl;
         this.password = password;
-        this.actif = actif;
-        this.roles = roles;
-    }
-
-
-    public utilisateur(Long id, @NotBlank @Size(max = 20) String username, @Email String email,
-                       @NotBlank @Size(max = 20) String lastname, @NotBlank @Size(max = 120) String password, boolean actif,
-                       Set<Role> roles) {
-        super();
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.lastname = lastname;
-        this.password = password;
-        this.actif = actif;
-        this.roles = roles;
-    }
-
-
-    public utilisateur(@NotBlank @Size(max = 20) String username, @Email String email,
-                       @NotBlank @Size(max = 20) String lastname, @NotBlank @Size(max = 20)  String password) {
-        super();
-        this.username = username;
-        this.email = email;
-        this.lastname = lastname;
-        this.password = password;
-    }
-
-
-    public utilisateur(@NotBlank @Size(max = 20) String username, @Email String email,
-                       @NotBlank @Size(max = 20) String lastname,
-                       @NotBlank @Size(max = 120) String password, boolean actif) {
-        super();
-        this.username = username;
-        this.email = email;
-        this.lastname = lastname;
-        this.password = password;
-        this.actif = actif;
+        this.adresse = adresse;
     }
 
     public Set<Role> getRoles() {
@@ -142,6 +122,14 @@ public class utilisateur implements Serializable {
         this.email = email;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
     public String getLastname() {
         return lastname;
     }
@@ -172,6 +160,54 @@ public class utilisateur implements Serializable {
 
     public void setDepartement(Departement departement) {
         this.departement = departement;
+    }
+
+    public Classe getClasse() {
+        return classe;
+    }
+
+    public void setClasse(Classe classe) {
+        this.classe = classe;
+    }
+
+    public String getIdentifiant() {
+        return identifiant;
+    }
+
+    public void setIdentifiant(String identifiant) {
+        this.identifiant = identifiant;
+    }
+
+    public String getCodePostal() {
+        return codePostal;
+    }
+
+    public void setCodePostal(String codePostal) {
+        this.codePostal = codePostal;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLinkedInUrl() {
+        return linkedInUrl;
+    }
+
+    public void setLinkedInUrl(String linkedInUrl) {
+        this.linkedInUrl = linkedInUrl;
+    }
+
+    public String getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
     }
 }
 

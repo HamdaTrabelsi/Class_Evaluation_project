@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sesame.projet_evaluation.dto.UserDetailsImpl;
-import sesame.projet_evaluation.entities.utilisateur;
+import sesame.projet_evaluation.entities.Utilisateur;
 import sesame.projet_evaluation.repository.UserRepository;
 
 @Service
@@ -18,17 +18,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        utilisateur utilisateur = userRepository.findByEmail(email)
+        Utilisateur utilisateur = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + email));
 
         return UserDetailsImpl.build(utilisateur);
     }
 
-    public utilisateur updateUser(utilisateur utilisateur)	{
+    public Utilisateur updateUser(Utilisateur utilisateur)	{
         return userRepository.save(utilisateur);
 
     }
-    public utilisateur findOne(long id){
+    public Utilisateur findOne(long id){
         return userRepository.findById(id).get();
     }
 

@@ -25,13 +25,13 @@ public class Role {
         this.name = name;
     }
 
-    public Role(ERole name, utilisateur utilisateur) {
+    public Role(ERole name, Utilisateur utilisateur) {
         super();
         this.name = name;
 
     }
 
-    public Role(Integer id, ERole name, utilisateur utilisateur) {
+    public Role(Integer id, ERole name, Utilisateur utilisateur) {
         super();
         this.id = id;
         this.name = name;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import sesame.projet_evaluation.entities.utilisateur;
+import sesame.projet_evaluation.entities.Utilisateur;
 
 import java.util.Collection;
 import java.util.List;
@@ -132,7 +132,7 @@ public class UserDetailsImpl  implements UserDetails {
         this.authorities = authorities;
     }
 
-    public static UserDetailsImpl build(utilisateur utilisateur) {
+    public static UserDetailsImpl build(Utilisateur utilisateur) {
         List<GrantedAuthority> authorities = utilisateur.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());

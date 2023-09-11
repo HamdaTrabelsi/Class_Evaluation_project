@@ -1,21 +1,26 @@
 package sesame.projet_evaluation.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import sesame.projet_evaluation.entities.utilisateur;
+import sesame.projet_evaluation.entities.Utilisateur;
 
 import java.util.Optional;
 
 @Repository
 @Transactional(readOnly=true)
-public interface UserRepository extends JpaRepository<utilisateur, Long> {
+public interface UserRepository extends JpaRepository<Utilisateur, Long> {
 
-    Optional<utilisateur> findByUsername(String username);
+    Optional<Utilisateur> findByUsername(String username);
 
-    Optional<utilisateur> findByEmail(String email);
+    Optional<Utilisateur> findByEmail(String email);
 
     Boolean existsByUsername(String username);
 
     Boolean existsByEmail(String email);
+
+    @Query(value = "select count (u.id) from Utilisateur u where u.id <> :id and u.email = :email")
+    Integer checkIfEmailExistsWhenUpdating(@Param("id") Long id, @Param("email") String email);
 }
