@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import sesame.projet_evaluation.entities.Classe;
 import sesame.projet_evaluation.entities.Utilisateur;
 
 import java.util.Collection;
@@ -28,7 +29,7 @@ public class UserDetailsImpl  implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-
+    private Classe classe;
 
 
     @Override
@@ -123,13 +124,24 @@ public class UserDetailsImpl  implements UserDetails {
         this.authorities = authorities;
     }
 
-    public UserDetailsImpl(Long id, String email, String username, String lastname, String password, Collection<? extends GrantedAuthority> authorities) {
+    public Classe getClasse() {
+        return classe;
+    }
+
+    public void setClasse(Classe classe) {
+        this.classe = classe;
+    }
+
+    public UserDetailsImpl(Long id, String email, String username, String lastname, String password, Collection<? extends GrantedAuthority> authorities, Classe classe) {
         this.id = id;
         this.email = email;
         this.username = username;
         this.lastname = lastname;
         this.password = password;
         this.authorities = authorities;
+        if(classe!=null) {
+            this.classe=classe;
+        }
     }
 
     public static UserDetailsImpl build(Utilisateur utilisateur) {
@@ -145,7 +157,8 @@ public class UserDetailsImpl  implements UserDetails {
                 utilisateur.getUsername(),
                 utilisateur.getLastname(),
                 utilisateur.getPassword(),
-                authorities
+                authorities,
+                utilisateur.getClasse()
         );
     }
 }

@@ -1,12 +1,18 @@
 package sesame.projet_evaluation.entities;
 
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 import sesame.projet_evaluation.entities.utilityClasses.Formulaire;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@TypeDefs({
+        @TypeDef(name = "json", typeClass = JsonType.class),
+})
 public class Evaluation {
 
     @Id

@@ -2,17 +2,17 @@ package sesame.projet_evaluation.entities.utilityClasses;
 
 public class Critere {
 
-    private String critereIntdex;
+    private String critereIndex;
     private String titre;
 
     private String reponse;
 
-    public String getCritereIntdex() {
-        return critereIntdex;
+    public String getCritereIndex() {
+        return critereIndex;
     }
 
-    public void setCritereIntdex(String critereIntdex) {
-        this.critereIntdex = critereIntdex;
+    public void setCritereIndex(String critereIndex) {
+        this.critereIndex = critereIndex;
     }
 
     public String getTitre() {

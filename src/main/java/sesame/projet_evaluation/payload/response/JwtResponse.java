@@ -1,5 +1,7 @@
 package sesame.projet_evaluation.payload.response;
 
+import sesame.projet_evaluation.entities.Classe;
+
 import java.util.List;
 
 public class JwtResponse {
@@ -11,13 +13,16 @@ public class JwtResponse {
         private String lastname;
         private List<String> roles;
 
-	public JwtResponse(String accessToken, Long id, String username, String email, String lastname,  List<String> roles) {
+        private Classe classe;
+
+	public JwtResponse(String accessToken, Long id, String username, String email, String lastname, List<String> roles, Classe classe) {
         this.token = accessToken;
         this.id = id;
         this.username = username;
         this.email = email;
         this.lastname = lastname;
         this.roles = roles;
+        this.classe = classe;
     }
 
         public String getAccessToken() {
@@ -75,5 +80,11 @@ public class JwtResponse {
         return roles;
     }
 
+    public Classe getClasse() {
+        return classe;
+    }
 
+    public void setClasse(Classe classe) {
+        this.classe = classe;
+    }
 }
