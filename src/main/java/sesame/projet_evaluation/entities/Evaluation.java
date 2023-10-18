@@ -40,6 +40,9 @@ public class Evaluation {
     @Column(columnDefinition = "jsonb")
     private Formulaire formulaire;
 
+    @Column(columnDefinition = "TEXT")
+    private String introduction;
+
     public Long getId() {
         return id;
     }
@@ -113,5 +116,13 @@ public class Evaluation {
     }
 
     public Evaluation() {
+    }
+
+    public String getIntroduction() {
+        return introduction;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
     }
 }

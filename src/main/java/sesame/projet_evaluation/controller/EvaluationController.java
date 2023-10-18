@@ -1,6 +1,8 @@
 package sesame.projet_evaluation.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sesame.projet_evaluation.dto.EvaluationDTO;
 import sesame.projet_evaluation.dto.StudentEvaluationDTO;
@@ -47,7 +49,13 @@ public class EvaluationController {
         return studentEvaluationDTOS;
     }
 
+    @GetMapping("/find/{evaluationId}/{userId}")
+    public  ResponseEntity<EvaluationDTO> getEvaluationById(@PathVariable Long evaluationId, @PathVariable Long userId){
+        List<Soumission> soumission = soumissionRepository.getSoumissionByEvaluationAndUtilisateur(evaluationId, userId);
+        if(soumission.size()>0) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
 
-
-
+        return ResponseEntity.ok(EvaluationDTO.fromEntity(evaluationRepository.findById(evaluationId).get()));
+    }
 }
