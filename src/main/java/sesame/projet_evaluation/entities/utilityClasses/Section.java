@@ -14,6 +14,10 @@ public class Section {
 
     private String sectionId;
 
+    private Long enseignantId;
+
+    private Long matiereid;
+
     private String sectionName;
 
     public Section() {
@@ -41,5 +45,21 @@ public class Section {
 
     public void setSectionName(String sectionName) {
         this.sectionName = sectionName;
+    }
+
+    public Long getEnseignantId() {
+        return enseignantId;
+    }
+
+    public void setEnseignantId(Long enseignantId) {
+        this.enseignantId = enseignantId;
+    }
+
+    public Long getMatiereid() {
+        return matiereid;
+    }
+
+    public void setMatiereid(Long matiereid) {
+        this.matiereid = matiereid;
     }
 }

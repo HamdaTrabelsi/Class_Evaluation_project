@@ -16,6 +16,11 @@ public class Classe {
     @Size(max = 20)
     private String nom;
 
+    private String anneeUniversitaire;
+
+    public Classe() {
+    }
+
     public Long getId() {
         return id;
     }
@@ -30,5 +35,13 @@ public class Classe {
 
     public void setNom(String nom) {
         this.nom = nom;
+    }
+
+    public String getAnneeUniversitaire() {
+        return anneeUniversitaire;
+    }
+
+    public void setAnneeUniversitaire(String anneeUniversitaire) {
+        this.anneeUniversitaire = anneeUniversitaire;
     }
 }
