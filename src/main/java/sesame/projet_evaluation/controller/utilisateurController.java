@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import sesame.projet_evaluation.dto.UserDto;
 import sesame.projet_evaluation.entities.Utilisateur;
 import sesame.projet_evaluation.payload.response.MessageResponse;
+import sesame.projet_evaluation.repository.RoleRepository;
 import sesame.projet_evaluation.repository.UserRepository;
+import sesame.projet_evaluation.utils.ERole;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -21,6 +23,9 @@ public class utilisateurController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    RoleRepository roleRepository;
 
     @Autowired
     PasswordEncoder encoder;
@@ -43,6 +48,18 @@ public class utilisateurController {
         Utilisateur user = userRepository.findById(id).get();
 
         return UserDto.fromClass(user);
+    }
+
+    @GetMapping("/getByRole")
+    public List<UserDto> getUsersByRole(@RequestParam String roleName) {
+
+        List<UserDto> userDtos = new ArrayList<>();
+
+        userRepository.findByRoleName(ERole.valueOf(roleName)).forEach(user -> {
+            userDtos.add(UserDto.fromClass(user));
+        });
+
+        return userDtos;
     }
 
     @PutMapping("/updateUser/{id}")
