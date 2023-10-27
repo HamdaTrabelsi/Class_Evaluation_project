@@ -41,7 +41,7 @@ public class Evaluation {
     private Formulaire formulaire;
 
     @Column(columnDefinition = "TEXT")
-    private String introduction;
+    private String description;
 
     public Long getId() {
         return id;
@@ -118,11 +118,11 @@ public class Evaluation {
     public Evaluation() {
     }
 
-    public String getIntroduction() {
-        return introduction;
+    public String getDescription() {
+        return description;
     }
 
-    public void setIntroduction(String introduction) {
-        this.introduction = introduction;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

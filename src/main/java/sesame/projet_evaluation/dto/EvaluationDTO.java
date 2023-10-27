@@ -15,13 +15,14 @@ public class EvaluationDTO {
     private boolean actif;
     private ClasseDTO classe;
     private Formulaire formulaire;
+    private String description;
 
     // Constructors, getters, and setters
 
     public EvaluationDTO() {
     }
 
-    public EvaluationDTO(Long id, String titre, String anneeUniversitaire, String semestre, Date creationDate, Date limitDate, boolean actif, ClasseDTO classe, Formulaire formulaire) {
+    public EvaluationDTO(Long id, String titre, String anneeUniversitaire, String semestre, Date creationDate, Date limitDate, boolean actif, ClasseDTO classe, Formulaire formulaire, String description) {
         this.id = id;
         this.titre = titre;
         this.anneeUniversitaire = anneeUniversitaire;
@@ -31,6 +32,7 @@ public class EvaluationDTO {
         this.actif = actif;
         this.classe = classe;
         this.formulaire = formulaire;
+        this.description = description;
     }
 
     public static EvaluationDTO fromEntity(Evaluation evaluation) {
@@ -44,7 +46,8 @@ public class EvaluationDTO {
                 evaluation.getLimitDate(),
                 evaluation.isActif(),
                 classeDTO,
-                evaluation.getFormulaire()
+                evaluation.getFormulaire(),
+                evaluation.getDescription()
         );
     }
 
@@ -57,7 +60,7 @@ public class EvaluationDTO {
         evaluation.setCreationDate(this.creationDate);
         evaluation.setLimitDate(this.limitDate);
         evaluation.setActif(this.actif);
-
+        evaluation.setDescription(this.description);
         if (this.classe != null) {
             evaluation.setClasse(this.classe.toEntity());
         }
@@ -138,5 +141,13 @@ public class EvaluationDTO {
 
     public void setFormulaire(Formulaire formulaire) {
         this.formulaire = formulaire;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -32,6 +32,11 @@ public class MatiereController {
         return matiereRepository.findAll();
     }
 
+    @GetMapping("/getMatieresByClasse/{id}")
+    public List<Matiere> getAllByClasse(@PathVariable("id") Long classId) {
+        return matiereRepository.findMatieresByClass(classId);
+    }
+
     @PostMapping("/save")
     public ResponseEntity<?> add(@RequestBody Matiere matiere) {
 
