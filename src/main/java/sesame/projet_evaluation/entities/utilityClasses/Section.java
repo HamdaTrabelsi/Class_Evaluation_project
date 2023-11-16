@@ -16,7 +16,7 @@ public class Section {
 
     private Long enseignantId;
 
-    private Long matiereid;
+    private Long matiereId;
 
     private String sectionName;
 
@@ -55,11 +55,11 @@ public class Section {
         this.enseignantId = enseignantId;
     }
 
-    public Long getMatiereid() {
-        return matiereid;
+    public Long getMatiereId() {
+        return matiereId;
     }
 
-    public void setMatiereid(Long matiereid) {
-        this.matiereid = matiereid;
+    public void setMatiereId(Long matiereId) {
+        this.matiereId = matiereId;
     }
 }
