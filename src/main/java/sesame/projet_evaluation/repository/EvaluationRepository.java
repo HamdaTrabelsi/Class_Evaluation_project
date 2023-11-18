@@ -14,4 +14,5 @@ public interface EvaluationRepository  extends JpaRepository<Evaluation, Long> {
 
     @Query("select e from Evaluation e where e.classe.id =:classeId")
     public List<Evaluation> getEvaluationByClasse(@Param("classeId") Long classeId);
+
 }

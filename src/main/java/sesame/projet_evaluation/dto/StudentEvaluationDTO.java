@@ -9,6 +9,7 @@ public class StudentEvaluationDTO {
 
     private Long evaluationId;
 
+
     private Long reponseId;
 
     private Date dateReponse;
@@ -102,4 +103,5 @@ public class StudentEvaluationDTO {
     public void setDateReponse(Date dateReponse) {
         this.dateReponse = dateReponse;
     }
+
 }

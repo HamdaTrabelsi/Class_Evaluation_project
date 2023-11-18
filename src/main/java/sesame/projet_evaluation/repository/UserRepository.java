@@ -28,4 +28,8 @@ public interface UserRepository extends JpaRepository<Utilisateur, Long> {
 
     @Query("SELECT u FROM Utilisateur u JOIN u.roles r WHERE r.name = :roleName")
     List<Utilisateur> findByRoleName(@Param("roleName") ERole roleName);
+
+    @Query("SELECT COUNT(u.id) from Utilisateur u join u.roles r WHERE u.classe.id = :classeId and r.name = :roleName")
+    Integer countClasseStudents(@Param("classeId") Long classeId,@Param("roleName") ERole roleName);
+
 }
