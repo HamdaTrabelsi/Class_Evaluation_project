@@ -83,7 +83,7 @@ public class SoumissionController {
             for(Section s : f.getSections()){
                 for(Question q : s.getQuestions()){
                     for (Critere c : q.getCriteres()){
-                        sectionStatisticDTOS = addToStats(s.getSectionName(),q.getQuestionText(),c.getTitre(), c.getReponse(),sectionStatisticDTOS);
+                        sectionStatisticDTOS = addToStats(s.getSectionId(), s.getSectionName(),q.getQuestionIndex(), q.getQuestionText(), c.getCritereIndex(),c.getTitre(), c.getReponse(),sectionStatisticDTOS);
                     }
                 }
             }
@@ -109,83 +109,89 @@ public class SoumissionController {
     }
 
 
-    public Map<String, SectionStatisticDTO>  addToStats(String sectionName, String questionName, String critereName, String critereResponse, Map<String, SectionStatisticDTO> sectionStatisticDTOS) {
-        SectionStatisticDTO sectionStatisticDTO = sectionStatisticDTOS.get(sectionName);
+    public Map<String, SectionStatisticDTO>  addToStats(String sectionIndex, String sectionName, String questionIndex, String questionName, String critereIndex, String critereName, String critereResponse, Map<String, SectionStatisticDTO> sectionStatisticDTOS) {
+        SectionStatisticDTO sectionStatisticDTO = sectionStatisticDTOS.get(sectionIndex);
 
         if (sectionStatisticDTO != null) {
-            QuestionStatisticDTO questionStatisticDTO = sectionStatisticDTO.getQuestions().get(questionName);
+            QuestionStatisticDTO questionStatisticDTO = sectionStatisticDTO.getQuestions().get(questionIndex);
 
             if (questionStatisticDTO != null) {
 
-                CritereStatisticDTO critereStatisticDTO = questionStatisticDTO.getCriteres().get(critereName);
+                CritereStatisticDTO critereStatisticDTO = questionStatisticDTO.getCriteres().get(critereIndex);
 
                 if (critereStatisticDTO != null) {
 
                     if (critereStatisticDTO.getResponses().containsKey(critereResponse)) {
                         int count = critereStatisticDTO.getResponses().get(critereResponse);
                         critereStatisticDTO.getResponses().put(critereResponse, count + 1);
-                        sectionStatisticDTOS.get(sectionName).getQuestions().get(questionName).getCriteres()
-                                .get(critereName).setResponses(critereStatisticDTO.getResponses());
+                        sectionStatisticDTOS.get(sectionIndex).getQuestions().get(questionIndex).getCriteres()
+                                .get(critereIndex).setResponses(critereStatisticDTO.getResponses());
 
                     } else {
                         critereStatisticDTO.getResponses().put(critereResponse, 1);
-                        sectionStatisticDTOS.get(sectionName).getQuestions().get(questionName).getCriteres()
-                                .get(critereName).setResponses(critereStatisticDTO.getResponses());
+                        sectionStatisticDTOS.get(sectionIndex).getQuestions().get(questionIndex).getCriteres()
+                                .get(critereIndex).setResponses(critereStatisticDTO.getResponses());
                     }
 
                 } else {
-                    CritereStatisticDTO newCritereStatisticDTO = createEmptyCritere(critereName, critereResponse);
-                    sectionStatisticDTOS.get(sectionName).getQuestions().get(questionName).getCriteres().put(critereName, newCritereStatisticDTO);
+                    CritereStatisticDTO newCritereStatisticDTO = createEmptyCritere(critereIndex, critereName, critereResponse);
+                    sectionStatisticDTOS.get(sectionIndex).getQuestions().get(questionIndex).getCriteres().put(critereIndex, newCritereStatisticDTO);
                 }
 
              } else {
-                QuestionStatisticDTO newQuestionStatisticDTO = createEmptyQuestion(questionName,critereName,critereResponse);
-                sectionStatisticDTOS.get(sectionName).getQuestions().put(questionName, newQuestionStatisticDTO);
+                QuestionStatisticDTO newQuestionStatisticDTO = createEmptyQuestion(questionIndex, questionName,critereIndex, critereName,critereResponse);
+                sectionStatisticDTOS.get(sectionIndex).getQuestions().put(questionIndex, newQuestionStatisticDTO);
             }
         } else {
-            SectionStatisticDTO newSectionStatisticDTO = createEmptySection(sectionName,questionName,critereName,critereResponse);
+            SectionStatisticDTO newSectionStatisticDTO = createEmptySection(sectionIndex, sectionName ,questionIndex, questionName,critereIndex, critereName,critereResponse);
 
-            sectionStatisticDTOS.put(sectionName, newSectionStatisticDTO);
+            sectionStatisticDTOS.put(sectionIndex, newSectionStatisticDTO);
         }
 
         return sectionStatisticDTOS;
     }
 
-    public SectionStatisticDTO createEmptySection(String sectionName, String questionName, String critereName, String critereResponse) {
+    public SectionStatisticDTO createEmptySection(String sectionIndex, String sectionName,String questionIndex, String questionText, String critereIndex, String critereName, String critereResponse) {
         SectionStatisticDTO newSectionStatisticDTO = new SectionStatisticDTO();
+        newSectionStatisticDTO.setSectionIndex(sectionIndex);
         newSectionStatisticDTO.setSectionName(sectionName);
 
         QuestionStatisticDTO newQuestionStatisticDTO = new QuestionStatisticDTO();
-        newQuestionStatisticDTO.setQuestionText(questionName);
-        newSectionStatisticDTO.getQuestions().put(questionName,newQuestionStatisticDTO);
+        newQuestionStatisticDTO.setQuestionText(questionText);
+        newQuestionStatisticDTO.setQuestionIndex(questionIndex);
+        newSectionStatisticDTO.getQuestions().put(questionIndex,newQuestionStatisticDTO);
 
         CritereStatisticDTO newCritereStatisticDTO = new CritereStatisticDTO();
+        newCritereStatisticDTO.setCritereIndex(critereIndex);
         newCritereStatisticDTO.setTitle(critereName);
         newCritereStatisticDTO.getResponses().put(critereResponse, 1);
 
-        newQuestionStatisticDTO.getCriteres().put(critereName, newCritereStatisticDTO);
+        newQuestionStatisticDTO.getCriteres().put(critereIndex, newCritereStatisticDTO);
 
         return newSectionStatisticDTO;
     }
 
-    public QuestionStatisticDTO createEmptyQuestion(String questionName, String critereName, String critereResponse) {
+    public QuestionStatisticDTO createEmptyQuestion(String questionIndex, String questionText, String critereIndex, String critereName, String critereResponse) {
 
         QuestionStatisticDTO newQuestionStatisticDTO = new QuestionStatisticDTO();
-        newQuestionStatisticDTO.setQuestionText(questionName);
+        newQuestionStatisticDTO.setQuestionIndex(questionIndex);
+        newQuestionStatisticDTO.setQuestionText(questionText);
 
         CritereStatisticDTO newCritereStatisticDTO = new CritereStatisticDTO();
+        newCritereStatisticDTO.setCritereIndex(critereIndex);
         newCritereStatisticDTO.setTitle(critereName);
         newCritereStatisticDTO.getResponses().put(critereResponse, 1);
 
-        newQuestionStatisticDTO.getCriteres().put(critereName, newCritereStatisticDTO);
+        newQuestionStatisticDTO.getCriteres().put(critereIndex, newCritereStatisticDTO);
 
         return newQuestionStatisticDTO;
     }
 
-    public CritereStatisticDTO createEmptyCritere(String critereName, String critereResponse) {
+    public CritereStatisticDTO createEmptyCritere(String critereIndex, String critereTitle, String critereResponse) {
 
         CritereStatisticDTO newCritereStatisticDTO = new CritereStatisticDTO();
-        newCritereStatisticDTO.setTitle(critereName);
+        newCritereStatisticDTO.setCritereIndex(critereIndex);
+        newCritereStatisticDTO.setTitle(critereTitle);
         newCritereStatisticDTO.getResponses().put(critereResponse, 1);
 
         return newCritereStatisticDTO;

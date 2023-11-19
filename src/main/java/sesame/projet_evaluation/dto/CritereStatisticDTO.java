@@ -7,13 +7,16 @@ public class CritereStatisticDTO {
 
     private String title;
 
+    private String critereIndex;
+
     private Map<String, Integer> responses = new HashMap<>();
 
     public CritereStatisticDTO() {
     }
 
-    public CritereStatisticDTO(String title, Map<String, Integer> responses) {
+    public CritereStatisticDTO(String title, String critereIndex, Map<String, Integer> responses) {
         this.title = title;
+        this.critereIndex = critereIndex;
         this.responses = responses;
     }
 
@@ -31,5 +34,13 @@ public class CritereStatisticDTO {
 
     public void setResponses(Map<String, Integer> responses) {
         this.responses = responses;
+    }
+
+    public String getCritereIndex() {
+        return critereIndex;
+    }
+
+    public void setCritereIndex(String critereIndex) {
+        this.critereIndex = critereIndex;
     }
 }

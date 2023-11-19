@@ -9,13 +9,16 @@ public class QuestionStatisticDTO {
 
     private String questionText;
 
+    private String questionIndex;
+
     private Map<String, CritereStatisticDTO> criteres = new HashMap<>();
 
     public QuestionStatisticDTO() {
     }
 
-    public QuestionStatisticDTO(String questionText, Map<String, CritereStatisticDTO> criteres) {
+    public QuestionStatisticDTO(String questionText, String questionIndex, Map<String, CritereStatisticDTO> criteres) {
         this.questionText = questionText;
+        this.questionIndex = questionIndex;
         this.criteres = criteres;
     }
 
@@ -33,5 +36,13 @@ public class QuestionStatisticDTO {
 
     public void setCriteres(Map<String, CritereStatisticDTO> criteres) {
         this.criteres = criteres;
+    }
+
+    public String getQuestionIndex() {
+        return questionIndex;
+    }
+
+    public void setQuestionIndex(String questionIndex) {
+        this.questionIndex = questionIndex;
     }
 }
