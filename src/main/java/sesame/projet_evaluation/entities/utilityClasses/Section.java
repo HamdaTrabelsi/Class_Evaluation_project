@@ -16,6 +16,8 @@ public class Section {
 
     private Long enseignantId;
 
+    private String enseignantName;
+
     private Long matiereId;
 
     private String sectionName;
@@ -61,5 +63,13 @@ public class Section {
 
     public void setMatiereId(Long matiereId) {
         this.matiereId = matiereId;
+    }
+
+    public String getEnseignantName() {
+        return enseignantName;
+    }
+
+    public void setEnseignantName(String enseignantName) {
+        this.enseignantName = enseignantName;
     }
 }

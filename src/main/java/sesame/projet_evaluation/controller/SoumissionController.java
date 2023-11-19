@@ -83,7 +83,7 @@ public class SoumissionController {
             for(Section s : f.getSections()){
                 for(Question q : s.getQuestions()){
                     for (Critere c : q.getCriteres()){
-                        sectionStatisticDTOS = addToStats(s.getSectionId(), s.getSectionName(),q.getQuestionIndex(), q.getQuestionText(), c.getCritereIndex(),c.getTitre(), c.getReponse(),sectionStatisticDTOS);
+                        sectionStatisticDTOS = addToStats(s.getSectionId(), s.getSectionName(),q.getQuestionIndex(), q.getQuestionText(), c.getCritereIndex(),c.getTitre(), c.getReponse(),sectionStatisticDTOS, s.getEnseignantName());
                     }
                 }
             }
@@ -109,7 +109,7 @@ public class SoumissionController {
     }
 
 
-    public Map<String, SectionStatisticDTO>  addToStats(String sectionIndex, String sectionName, String questionIndex, String questionName, String critereIndex, String critereName, String critereResponse, Map<String, SectionStatisticDTO> sectionStatisticDTOS) {
+    public Map<String, SectionStatisticDTO>  addToStats(String sectionIndex, String sectionName, String questionIndex, String questionName, String critereIndex, String critereName, String critereResponse, Map<String, SectionStatisticDTO> sectionStatisticDTOS, String enseignantName) {
         SectionStatisticDTO sectionStatisticDTO = sectionStatisticDTOS.get(sectionIndex);
 
         if (sectionStatisticDTO != null) {
@@ -143,7 +143,7 @@ public class SoumissionController {
                 sectionStatisticDTOS.get(sectionIndex).getQuestions().put(questionIndex, newQuestionStatisticDTO);
             }
         } else {
-            SectionStatisticDTO newSectionStatisticDTO = createEmptySection(sectionIndex, sectionName ,questionIndex, questionName,critereIndex, critereName,critereResponse);
+            SectionStatisticDTO newSectionStatisticDTO = createEmptySection(sectionIndex, sectionName ,questionIndex, questionName,critereIndex, critereName,critereResponse, enseignantName);
 
             sectionStatisticDTOS.put(sectionIndex, newSectionStatisticDTO);
         }
@@ -151,10 +151,11 @@ public class SoumissionController {
         return sectionStatisticDTOS;
     }
 
-    public SectionStatisticDTO createEmptySection(String sectionIndex, String sectionName,String questionIndex, String questionText, String critereIndex, String critereName, String critereResponse) {
+    public SectionStatisticDTO createEmptySection(String sectionIndex, String sectionName,String questionIndex, String questionText, String critereIndex, String critereName, String critereResponse, String enseignantName) {
         SectionStatisticDTO newSectionStatisticDTO = new SectionStatisticDTO();
         newSectionStatisticDTO.setSectionIndex(sectionIndex);
         newSectionStatisticDTO.setSectionName(sectionName);
+        newSectionStatisticDTO.setEnseignantName(enseignantName);
 
         QuestionStatisticDTO newQuestionStatisticDTO = new QuestionStatisticDTO();
         newQuestionStatisticDTO.setQuestionText(questionText);

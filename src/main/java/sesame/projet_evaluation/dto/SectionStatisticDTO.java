@@ -12,15 +12,18 @@ public class SectionStatisticDTO {
 
     private String sectionIndex;
 
+    private String enseignantName;
+
     private Map<String,QuestionStatisticDTO> questions = new HashMap<>();
 
     public SectionStatisticDTO() {
     }
 
-    public SectionStatisticDTO(String sectionName, String sectionIndex, Map<String, QuestionStatisticDTO> questions) {
+    public SectionStatisticDTO(String sectionName, String sectionIndex, Map<String, QuestionStatisticDTO> questions, String enseignantName) {
         this.sectionName = sectionName;
         this.sectionIndex = sectionIndex;
         this.questions = questions;
+        this.enseignantName = enseignantName;
     }
 
     public String getSectionName() {
@@ -45,5 +48,13 @@ public class SectionStatisticDTO {
 
     public void setSectionIndex(String sectionIndex) {
         this.sectionIndex = sectionIndex;
+    }
+
+    public String getEnseignantName() {
+        return enseignantName;
+    }
+
+    public void setEnseignantName(String enseignantName) {
+        this.enseignantName = enseignantName;
     }
 }
