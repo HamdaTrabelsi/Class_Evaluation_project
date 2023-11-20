@@ -1,6 +1,5 @@
 package sesame.projet_evaluation.controller;
 
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sesame.projet_evaluation.dto.CritereStatisticDTO;
@@ -8,8 +7,11 @@ import sesame.projet_evaluation.dto.EtudiantDTO;
 import sesame.projet_evaluation.dto.QuestionStatisticDTO;
 import sesame.projet_evaluation.dto.SectionStatisticDTO;
 import sesame.projet_evaluation.entities.Evaluation;
+import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneBarometre;
+import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneCours;
+import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneEval;
+import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneFormation;
 import sesame.projet_evaluation.entities.Soumission;
-import sesame.projet_evaluation.entities.Utilisateur;
 import sesame.projet_evaluation.entities.utilityClasses.Critere;
 import sesame.projet_evaluation.entities.utilityClasses.Formulaire;
 import sesame.projet_evaluation.entities.utilityClasses.Question;
@@ -22,7 +24,6 @@ import sesame.projet_evaluation.repository.UserRepository;
 import sesame.projet_evaluation.utils.ERole;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -49,7 +50,7 @@ public class SoumissionController {
 
     @GetMapping("/getById/{id}")
     public Soumission find(@PathVariable Long id) throws ResourceNotFoundException {
-        return soumissionRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Soumission not found with id: " + id));
+        return soumissionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Soumission not found with id: " + id));
     }
 
     @GetMapping("/getStudentByEvaluation/{id}")
@@ -67,7 +68,6 @@ public class SoumissionController {
     }
 
 
-
     @GetMapping("/getSoumissionByEvaluation/{evaluationId}")
     public Map<String, SectionStatisticDTO> getSoumissionByEvaluation(@PathVariable Long evaluationId) {
         List<Soumission> soumissionList = soumissionRepository.getSoumissionByEvaluation(evaluationId);
@@ -79,11 +79,11 @@ public class SoumissionController {
 
         Map<String, SectionStatisticDTO> sectionStatisticDTOS = new HashMap<>();
 
-        for(Formulaire f : formulaires) {
-            for(Section s : f.getSections()){
-                for(Question q : s.getQuestions()){
-                    for (Critere c : q.getCriteres()){
-                        sectionStatisticDTOS = addToStats(s.getSectionId(), s.getSectionName(),q.getQuestionIndex(), q.getQuestionText(), c.getCritereIndex(),c.getTitre(), c.getReponse(),sectionStatisticDTOS, s.getEnseignantName());
+        for (Formulaire f : formulaires) {
+            for (Section s : f.getSections()) {
+                for (Question q : s.getQuestions()) {
+                    for (Critere c : q.getCriteres()) {
+                        sectionStatisticDTOS = addToStats(s.getSectionId(), s.getSectionName(), q.getQuestionIndex(), q.getQuestionText(), c.getCritereIndex(), c.getTitre(), c.getReponse(), sectionStatisticDTOS, s.getEnseignantName());
                     }
                 }
             }
@@ -95,10 +95,10 @@ public class SoumissionController {
     }
 
     @GetMapping("/getNumberOfSoumissionForClasse/{evaluationId}")
-    public Map<String, Integer> getNumberOfSoumissionsForClasse(@PathVariable Long evaluationId){
+    public Map<String, Integer> getNumberOfSoumissionsForClasse(@PathVariable Long evaluationId) {
         Evaluation evaluation = evaluationRepository.findById(evaluationId).get();
         Integer totalEtudiantsClasse = userRepository.countClasseStudents(evaluation.getClasse().getId(), ERole.ROLE_ETUDIANT);
-        Integer nbrReponses = soumissionRepository.countSoumissionForEvaluation(evaluationId,ERole.ROLE_ETUDIANT);
+        Integer nbrReponses = soumissionRepository.countSoumissionForEvaluation(evaluationId, ERole.ROLE_ETUDIANT);
         Integer nonRepondus = totalEtudiantsClasse - nbrReponses;
 
         Map<String, Integer> statsReponses = new HashMap<>();
@@ -108,8 +108,159 @@ public class SoumissionController {
         return statsReponses;
     }
 
+    @GetMapping("/getMoyennesEvaluation/{evaluationId}")
+    public MoyenneEval getMoyennesEvaluation(@PathVariable Long evaluationId) {
+        List<Soumission> soumissionList = soumissionRepository.getSoumissionByEvaluation(evaluationId);
 
-    public Map<String, SectionStatisticDTO>  addToStats(String sectionIndex, String sectionName, String questionIndex, String questionName, String critereIndex, String critereName, String critereResponse, Map<String, SectionStatisticDTO> sectionStatisticDTOS, String enseignantName) {
+        MoyenneEval moyenneEval = calculateMoyenne(soumissionList);
+
+        return moyenneEval;
+    }
+
+    public MoyenneEval calculateMoyenne(List<Soumission> soumissionList) {
+        MoyenneEval moyenneEval = new MoyenneEval();
+
+        Map<String, SectionStatisticDTO> sectionStatisticDTOS = new HashMap<>();
+
+        for (Soumission soumission : soumissionList) {
+            for (Section section : soumission.getFormulaire().getSections()) {
+                for (Question question : section.getQuestions()) {
+                    for (Critere critere : question.getCriteres()) {
+                        sectionStatisticDTOS = addToStats(section.getSectionId(), section.getSectionName(), question.getQuestionIndex(), question.getQuestionText(), critere.getCritereIndex(), critere.getTitre(), critere.getReponse(), sectionStatisticDTOS, section.getEnseignantName());
+                    }
+                }
+            }
+        }
+
+        MoyenneFormation moyenneFormation = new MoyenneFormation();
+        MoyenneBarometre moyenneBarometre = new MoyenneBarometre();
+
+        double totalSections = 0;
+
+        List<MoyenneCours> moyenneCoursList = new ArrayList<>();
+
+        for (Map.Entry<String, SectionStatisticDTO> section : sectionStatisticDTOS.entrySet()) {
+            if (!section.getValue().getSectionName().equals("Baromètre de satisfaction")) {
+
+                MoyenneCours moyenneCours = new MoyenneCours();
+                moyenneCours.setEnseignant(section.getValue().getEnseignantName());
+                moyenneCours.setCourseName(section.getValue().getSectionName());
+
+                double totalQuestions = 0;
+
+
+                for (Map.Entry<String, QuestionStatisticDTO> question : section.getValue().getQuestions().entrySet()) {
+
+                    double totalCriteres = 0;
+                    for (Map.Entry<String, CritereStatisticDTO> critere : question.getValue().getCriteres().entrySet()) {
+                        double totalReponses = 0;
+
+                        for (Map.Entry<String, Integer> reponse : critere.getValue().getResponses().entrySet()) {
+
+                            double valeurReponse = 0;
+                            switch (reponse.getKey()) {
+                                case "Oui":
+                                    valeurReponse = (double) reponse.getValue() * 20;
+                                    break;
+                                case "Plutot Oui":
+                                    valeurReponse = (double) reponse.getValue() * 12;
+                                    break;
+                                case "Plutot Non":
+                                    valeurReponse = (double) reponse.getValue() * 8;
+                                    break;
+                                case "Non":
+                                    valeurReponse = (double) reponse.getValue() * 0;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            totalReponses += valeurReponse;
+                        }
+                        double moyenneCritere = totalReponses / soumissionList.size();
+                        totalCriteres += moyenneCritere;
+
+                    }
+                    double moyenneQuestions = totalCriteres / question.getValue().getCriteres().size();
+                    totalQuestions += moyenneQuestions;
+                }
+
+                double moyenneSection = totalQuestions / section.getValue().getQuestions().size();
+                moyenneCours.setScore(moyenneSection);
+
+                totalSections += moyenneSection;
+                moyenneCoursList.add(moyenneCours);
+            }
+            else if(section.getValue().getSectionName().equals("Baromètre de satisfaction")) {
+
+                moyenneBarometre.setNom("Baromètre");
+                Map<String, Double> scores = new HashMap<>();
+
+                double totalQuestions = 0;
+
+
+                for (Map.Entry<String, QuestionStatisticDTO> question : section.getValue().getQuestions().entrySet()) {
+
+                    double totalCriteres = 0;
+                    for (Map.Entry<String, CritereStatisticDTO> critere : question.getValue().getCriteres().entrySet()) {
+                        double totalReponses = 0;
+
+                        for (Map.Entry<String, Integer> reponse : critere.getValue().getResponses().entrySet()) {
+
+                            double valeurReponse = 0;
+                            switch (reponse.getKey()) {
+                                case "Oui":
+                                    valeurReponse = (double) reponse.getValue() * 20;
+                                    break;
+                                case "Plutot Oui":
+                                    valeurReponse = (double) reponse.getValue() * 12;
+                                    break;
+                                case "Plutot Non":
+                                    valeurReponse = (double) reponse.getValue() * 8;
+                                    break;
+                                case "Non":
+                                    valeurReponse = (double) reponse.getValue() * 0;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            totalReponses += valeurReponse;
+                        }
+                        double moyenneCritere = totalReponses / soumissionList.size();
+                        totalCriteres += moyenneCritere;
+
+
+                    }
+                    double moyenneQuestions = totalCriteres / question.getValue().getCriteres().size();
+                    totalQuestions += moyenneQuestions;
+
+                    scores.put(question.getValue().getQuestionText(), moyenneQuestions);
+                }
+
+                double moyenneSection = totalQuestions / section.getValue().getQuestions().size();
+                moyenneBarometre.setMoyenne(moyenneSection);
+                moyenneBarometre.setScores(scores);
+            }
+        }
+
+        long numberOfMatieres = sectionStatisticDTOS.entrySet().stream()
+                .filter(entry -> !entry.getValue().getSectionName().equals("Baromètre de satisfaction"))
+                .count();
+
+
+
+        double moyenneSections = totalSections/numberOfMatieres;
+        moyenneFormation.setIndiceRetour(moyenneSections);
+        moyenneFormation.setMoyennesCours(moyenneCoursList);
+        moyenneFormation.setName("Retour d’expérience: formation");
+
+        moyenneEval.setMoyenneBarometre(moyenneBarometre);
+        moyenneEval.setMoyenneFormation(moyenneFormation);
+
+        return moyenneEval;
+    }
+
+
+    public Map<String, SectionStatisticDTO> addToStats(String sectionIndex, String sectionName, String questionIndex, String questionName, String critereIndex, String critereName, String critereResponse, Map<String, SectionStatisticDTO> sectionStatisticDTOS, String enseignantName) {
         SectionStatisticDTO sectionStatisticDTO = sectionStatisticDTOS.get(sectionIndex);
 
         if (sectionStatisticDTO != null) {
@@ -138,12 +289,12 @@ public class SoumissionController {
                     sectionStatisticDTOS.get(sectionIndex).getQuestions().get(questionIndex).getCriteres().put(critereIndex, newCritereStatisticDTO);
                 }
 
-             } else {
-                QuestionStatisticDTO newQuestionStatisticDTO = createEmptyQuestion(questionIndex, questionName,critereIndex, critereName,critereResponse);
+            } else {
+                QuestionStatisticDTO newQuestionStatisticDTO = createEmptyQuestion(questionIndex, questionName, critereIndex, critereName, critereResponse);
                 sectionStatisticDTOS.get(sectionIndex).getQuestions().put(questionIndex, newQuestionStatisticDTO);
             }
         } else {
-            SectionStatisticDTO newSectionStatisticDTO = createEmptySection(sectionIndex, sectionName ,questionIndex, questionName,critereIndex, critereName,critereResponse, enseignantName);
+            SectionStatisticDTO newSectionStatisticDTO = createEmptySection(sectionIndex, sectionName, questionIndex, questionName, critereIndex, critereName, critereResponse, enseignantName);
 
             sectionStatisticDTOS.put(sectionIndex, newSectionStatisticDTO);
         }
@@ -151,7 +302,7 @@ public class SoumissionController {
         return sectionStatisticDTOS;
     }
 
-    public SectionStatisticDTO createEmptySection(String sectionIndex, String sectionName,String questionIndex, String questionText, String critereIndex, String critereName, String critereResponse, String enseignantName) {
+    public SectionStatisticDTO createEmptySection(String sectionIndex, String sectionName, String questionIndex, String questionText, String critereIndex, String critereName, String critereResponse, String enseignantName) {
         SectionStatisticDTO newSectionStatisticDTO = new SectionStatisticDTO();
         newSectionStatisticDTO.setSectionIndex(sectionIndex);
         newSectionStatisticDTO.setSectionName(sectionName);
@@ -160,7 +311,7 @@ public class SoumissionController {
         QuestionStatisticDTO newQuestionStatisticDTO = new QuestionStatisticDTO();
         newQuestionStatisticDTO.setQuestionText(questionText);
         newQuestionStatisticDTO.setQuestionIndex(questionIndex);
-        newSectionStatisticDTO.getQuestions().put(questionIndex,newQuestionStatisticDTO);
+        newSectionStatisticDTO.getQuestions().put(questionIndex, newQuestionStatisticDTO);
 
         CritereStatisticDTO newCritereStatisticDTO = new CritereStatisticDTO();
         newCritereStatisticDTO.setCritereIndex(critereIndex);
