@@ -168,7 +168,7 @@ public class SoumissionController {
 
         for (Formulaire f : formulaires) {
             for (Section s : f.getSections()) {
-                if(!s.getEnseignantId().equals(enseignantId)){
+                if(s.getEnseignantId() == null || !s.getEnseignantId().equals(enseignantId)){
                     continue;
                 }
                 for (Question q : s.getQuestions()) {
