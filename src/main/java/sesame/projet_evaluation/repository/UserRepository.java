@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import sesame.projet_evaluation.entities.Classe;
+import sesame.projet_evaluation.entities.Evaluation;
 import sesame.projet_evaluation.entities.Utilisateur;
 import sesame.projet_evaluation.utils.ERole;
 
@@ -31,5 +33,8 @@ public interface UserRepository extends JpaRepository<Utilisateur, Long> {
 
     @Query("SELECT COUNT(u.id) from Utilisateur u join u.roles r WHERE u.classe.id = :classeId and r.name = :roleName")
     Integer countClasseStudents(@Param("classeId") Long classeId,@Param("roleName") ERole roleName);
+
+    @Query("SELECT c from Matiere m join Classe c on m.classe.id = c.id join Utilisateur u on m.enseignant.id = u.id where u.id = :enseignantId")
+    List<Classe> getAnneeUniversitaireAndClasseByEnseignantId(@Param("enseignantId") Long enseignantId);
 
 }

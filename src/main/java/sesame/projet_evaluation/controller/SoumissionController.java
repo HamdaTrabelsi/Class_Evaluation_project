@@ -6,12 +6,14 @@ import sesame.projet_evaluation.dto.CritereStatisticDTO;
 import sesame.projet_evaluation.dto.EtudiantDTO;
 import sesame.projet_evaluation.dto.QuestionStatisticDTO;
 import sesame.projet_evaluation.dto.SectionStatisticDTO;
+import sesame.projet_evaluation.entities.Classe;
 import sesame.projet_evaluation.entities.Evaluation;
 import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneBarometre;
 import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneCours;
 import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneEval;
 import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneFormation;
 import sesame.projet_evaluation.entities.Soumission;
+import sesame.projet_evaluation.entities.enseignantClasses.AvailableStatistics;
 import sesame.projet_evaluation.entities.utilityClasses.Critere;
 import sesame.projet_evaluation.entities.utilityClasses.Formulaire;
 import sesame.projet_evaluation.entities.utilityClasses.Question;
@@ -23,7 +25,9 @@ import sesame.projet_evaluation.repository.SoumissionRepository;
 import sesame.projet_evaluation.repository.UserRepository;
 import sesame.projet_evaluation.utils.ERole;
 
+import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -42,6 +46,9 @@ public class SoumissionController {
     @Autowired
     private UserRepository userRepository;
 
+    private static final DecimalFormat df = new DecimalFormat("0.00");
+
+
     @PostMapping("/save")
     public Soumission save(@RequestBody Soumission soumission) {
         soumission.setDateCreation(new Date());
@@ -56,14 +63,6 @@ public class SoumissionController {
     @GetMapping("/getStudentByEvaluation/{id}")
     public List<EtudiantDTO> getStudentsByEvaluation(@PathVariable Long id) {
         List<EtudiantDTO> etudiants = soumissionRepository.getEtudiantsByEvaluation(id);
-//        List<EtudiantDTO> etudiantsDTO = new ArrayList<>();
-//        etudiants.forEach(e -> {
-//            EtudiantDTO etudiantDTO = new EtudiantDTO();
-//            etudiantDTO.setId(e.getId());
-//            etudiantDTO.setEmail(e.getEmail());
-//            etudiantDTO.setClasse(e.getClasse());
-//            etudiantDTO.setId(e.getId());
-//        });
         return etudiants;
     }
 
@@ -115,6 +114,46 @@ public class SoumissionController {
         MoyenneEval moyenneEval = calculateMoyenne(soumissionList);
 
         return moyenneEval;
+    }
+
+    @GetMapping("/getEnseignantAnneesUniversitaires/{enseignantId}")
+    public List<AvailableStatistics>  getEnseignatAnneesUniversitaires(@PathVariable Long enseignantId) {
+        List<Classe> classes = userRepository.getAnneeUniversitaireAndClasseByEnseignantId(enseignantId);
+
+        List<AvailableStatistics> availableStatisticsList = new ArrayList<>();
+        classes.forEach(classe -> {
+            OptionalInt index = IntStream.range(0, availableStatisticsList.size())
+                    .filter(i -> availableStatisticsList.get(i).getAnneeUniversitaire().equals(classe.getAnneeUniversitaire()))
+                    .findFirst();
+            if(index.isEmpty()) {
+                AvailableStatistics availableStatistics = new AvailableStatistics();
+                availableStatistics.setAnneeUniversitaire(classe.getAnneeUniversitaire());
+                Set<Classe> classeSet = new HashSet<>();
+                classeSet.add(classe);
+                availableStatistics.setClasseSet(classeSet);
+                availableStatisticsList.add(availableStatistics);
+            } else {
+                Set<Classe> classeSet = availableStatisticsList.get(index.getAsInt()).getClasseSet();
+                classeSet.add(classe);
+                availableStatisticsList.get(index.getAsInt()).setClasseSet(classeSet);
+            }
+        });
+        return availableStatisticsList;
+    }
+
+
+    @GetMapping("/getStatistiquesEnseignantByIdAndAnnee/{enseignantId}")
+    public List<Evaluation> getStatistiquesEnseignantByIdAndAnnee(@PathVariable Long enseignantId, @RequestParam String anneeUniversitaire){
+        List<Classe> enseignantClasses = soumissionRepository.getClassesByEnseignant(enseignantId, anneeUniversitaire);
+        List<Evaluation> evaluations = new ArrayList<>();
+        enseignantClasses.forEach(classe -> {
+            List<Evaluation> retievedEvaluations = soumissionRepository.getEvaluationsByClasse(classe.getId());
+            if(!retievedEvaluations.isEmpty()){
+                evaluations.addAll(retievedEvaluations);
+            }
+        });
+
+        return evaluations;
     }
 
     public MoyenneEval calculateMoyenne(List<Soumission> soumissionList) {
@@ -185,7 +224,7 @@ public class SoumissionController {
                 }
 
                 double moyenneSection = totalQuestions / section.getValue().getQuestions().size();
-                moyenneCours.setScore(moyenneSection);
+                moyenneCours.setScore(Double.valueOf(df.format(moyenneSection)));
 
                 totalSections += moyenneSection;
                 moyenneCoursList.add(moyenneCours);
@@ -233,11 +272,11 @@ public class SoumissionController {
                     double moyenneQuestions = totalCriteres / question.getValue().getCriteres().size();
                     totalQuestions += moyenneQuestions;
 
-                    scores.put(question.getValue().getQuestionText(), moyenneQuestions);
+                    scores.put(question.getValue().getQuestionText(), Double.valueOf(df.format(moyenneQuestions)));
                 }
 
                 double moyenneSection = totalQuestions / section.getValue().getQuestions().size();
-                moyenneBarometre.setMoyenne(moyenneSection);
+                moyenneBarometre.setMoyenne(Double.valueOf(df.format(moyenneSection)));
                 moyenneBarometre.setScores(scores);
             }
         }
@@ -249,7 +288,7 @@ public class SoumissionController {
 
 
         double moyenneSections = totalSections/numberOfMatieres;
-        moyenneFormation.setIndiceRetour(moyenneSections);
+        moyenneFormation.setIndiceRetour(Double.valueOf(df.format(moyenneSections)));
         moyenneFormation.setMoyennesCours(moyenneCoursList);
         moyenneFormation.setName("Retour d’expérience: formation");
 
@@ -258,7 +297,6 @@ public class SoumissionController {
 
         return moyenneEval;
     }
-
 
     public Map<String, SectionStatisticDTO> addToStats(String sectionIndex, String sectionName, String questionIndex, String questionName, String critereIndex, String critereName, String critereResponse, Map<String, SectionStatisticDTO> sectionStatisticDTOS, String enseignantName) {
         SectionStatisticDTO sectionStatisticDTO = sectionStatisticDTOS.get(sectionIndex);

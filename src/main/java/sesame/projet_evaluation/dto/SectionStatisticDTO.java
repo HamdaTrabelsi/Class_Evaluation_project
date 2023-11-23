@@ -10,6 +10,8 @@ public class SectionStatisticDTO {
 
     private String sectionName;
 
+    private String classeName;
+
     private String sectionIndex;
 
     private String enseignantName;
@@ -19,11 +21,12 @@ public class SectionStatisticDTO {
     public SectionStatisticDTO() {
     }
 
-    public SectionStatisticDTO(String sectionName, String sectionIndex, Map<String, QuestionStatisticDTO> questions, String enseignantName) {
+    public SectionStatisticDTO(String sectionName, String sectionIndex, Map<String, QuestionStatisticDTO> questions, String enseignantName, String classeName) {
         this.sectionName = sectionName;
         this.sectionIndex = sectionIndex;
         this.questions = questions;
         this.enseignantName = enseignantName;
+        this.classeName = classeName;
     }
 
     public String getSectionName() {
@@ -56,5 +59,13 @@ public class SectionStatisticDTO {
 
     public void setEnseignantName(String enseignantName) {
         this.enseignantName = enseignantName;
+    }
+
+    public String getClasseName() {
+        return classeName;
+    }
+
+    public void setClasseName(String classeName) {
+        this.classeName = classeName;
     }
 }
