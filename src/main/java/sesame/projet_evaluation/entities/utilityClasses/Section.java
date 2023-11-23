@@ -1,11 +1,6 @@
 package sesame.projet_evaluation.entities.utilityClasses;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import java.util.Set;
 
 public class Section {
@@ -17,6 +12,10 @@ public class Section {
     private Long enseignantId;
 
     private String enseignantName;
+
+    private String classeName;
+
+    private Long classeId;
 
     private Long matiereId;
 
@@ -71,5 +70,21 @@ public class Section {
 
     public void setEnseignantName(String enseignantName) {
         this.enseignantName = enseignantName;
+    }
+
+    public String getClasseName() {
+        return classeName;
+    }
+
+    public void setClasseName(String classeName) {
+        this.classeName = classeName;
+    }
+
+    public Long getClasseId() {
+        return classeId;
+    }
+
+    public void setClasseId(Long classeId) {
+        this.classeId = classeId;
     }
 }

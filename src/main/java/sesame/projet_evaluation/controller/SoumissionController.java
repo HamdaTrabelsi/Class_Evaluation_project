@@ -2,10 +2,7 @@ package sesame.projet_evaluation.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sesame.projet_evaluation.dto.CritereStatisticDTO;
-import sesame.projet_evaluation.dto.EtudiantDTO;
-import sesame.projet_evaluation.dto.QuestionStatisticDTO;
-import sesame.projet_evaluation.dto.SectionStatisticDTO;
+import sesame.projet_evaluation.dto.*;
 import sesame.projet_evaluation.entities.Classe;
 import sesame.projet_evaluation.entities.Evaluation;
 import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneBarometre;
@@ -143,7 +140,7 @@ public class SoumissionController {
 
 
     @GetMapping("/getStatistiquesEnseignantByIdAndAnnee/{enseignantId}")
-    public List<Evaluation> getStatistiquesEnseignantByIdAndAnnee(@PathVariable Long enseignantId, @RequestParam String anneeUniversitaire){
+    public Map<Long,ClasseIndexStatisticsDTO> getStatistiquesEnseignantByIdAndAnnee(@PathVariable Long enseignantId, @RequestParam String anneeUniversitaire){
         List<Classe> enseignantClasses = soumissionRepository.getClassesByEnseignant(enseignantId, anneeUniversitaire);
         List<Evaluation> evaluations = new ArrayList<>();
         enseignantClasses.forEach(classe -> {
@@ -153,7 +150,37 @@ public class SoumissionController {
             }
         });
 
-        return evaluations;
+        List<Soumission> soumissionList = new ArrayList<>();
+
+        evaluations.forEach(evaluation -> {
+            List<Soumission> evalSoumissions = soumissionRepository.getSoumissionByEvaluation(evaluation.getId());
+            if(evalSoumissions.size()>0){
+                soumissionList.addAll(evalSoumissions);
+            }
+        });
+
+        List<Formulaire> formulaires = new ArrayList<>();
+        soumissionList.forEach(soumission -> {
+            formulaires.add(soumission.getFormulaire());
+        });
+
+        Map<Long, ClasseIndexStatisticsDTO> classeIndexStatisticsDTOMap = new HashMap<>();
+
+        for (Formulaire f : formulaires) {
+            for (Section s : f.getSections()) {
+                if(!s.getEnseignantId().equals(enseignantId)){
+                    continue;
+                }
+                for (Question q : s.getQuestions()) {
+                    for (Critere c : q.getCriteres()) {
+                        classeIndexStatisticsDTOMap = addToStatsEnseignant(s.getClasseId(), s.getClasseName() ,s.getSectionId(), s.getSectionName(), q.getQuestionIndex(), q.getQuestionText(), c.getCritereIndex(), c.getTitre(), c.getReponse(), classeIndexStatisticsDTOMap, s.getEnseignantName());
+                    }
+                }
+            }
+        }
+
+
+        return classeIndexStatisticsDTOMap;
     }
 
     public MoyenneEval calculateMoyenne(List<Soumission> soumissionList) {
@@ -340,6 +367,61 @@ public class SoumissionController {
         return sectionStatisticDTOS;
     }
 
+
+    public Map<Long, ClasseIndexStatisticsDTO> addToStatsEnseignant(Long classeIndex, String classeName,String sectionIndex, String sectionName, String questionIndex, String questionName, String critereIndex, String critereName, String critereResponse, Map<Long, ClasseIndexStatisticsDTO> classeIndexStatisticsDTOMap, String enseignantName) {
+       ClasseIndexStatisticsDTO classeIndexStatisticsDTO = classeIndexStatisticsDTOMap.get(classeIndex);
+
+       if(classeIndexStatisticsDTO != null){
+
+
+           SectionStatisticDTO sectionStatisticDTO = classeIndexStatisticsDTO.getSections().get(sectionIndex);
+
+           if (sectionStatisticDTO != null) {
+               QuestionStatisticDTO questionStatisticDTO = sectionStatisticDTO.getQuestions().get(questionIndex);
+
+               if (questionStatisticDTO != null) {
+
+                   CritereStatisticDTO critereStatisticDTO = questionStatisticDTO.getCriteres().get(critereIndex);
+
+                   if (critereStatisticDTO != null) {
+
+                       if (critereStatisticDTO.getResponses().containsKey(critereResponse)) {
+                           int count = critereStatisticDTO.getResponses().get(critereResponse);
+                           critereStatisticDTO.getResponses().put(critereResponse, count + 1);
+                           classeIndexStatisticsDTOMap.get(classeIndex).getSections().get(sectionIndex).getQuestions().get(questionIndex).getCriteres()
+                                   .get(critereIndex).setResponses(critereStatisticDTO.getResponses());
+
+                       } else {
+                           critereStatisticDTO.getResponses().put(critereResponse, 1);
+                           classeIndexStatisticsDTOMap.get(classeIndex).getSections().get(sectionIndex).getQuestions().get(questionIndex).getCriteres()
+                                   .get(critereIndex).setResponses(critereStatisticDTO.getResponses());
+                       }
+
+                   } else {
+                       CritereStatisticDTO newCritereStatisticDTO = createEmptyCritere(critereIndex, critereName, critereResponse);
+                       classeIndexStatisticsDTOMap.get(classeIndex).getSections().get(sectionIndex).getQuestions().get(questionIndex).getCriteres().put(critereIndex, newCritereStatisticDTO);
+                   }
+
+               } else {
+                   QuestionStatisticDTO newQuestionStatisticDTO = createEmptyQuestion(questionIndex, questionName, critereIndex, critereName, critereResponse);
+                   classeIndexStatisticsDTOMap.get(classeIndex).getSections().get(sectionIndex).getQuestions().put(questionIndex, newQuestionStatisticDTO);
+               }
+           } else {
+               SectionStatisticDTO newSectionStatisticDTO = createEmptySection(sectionIndex, sectionName, questionIndex, questionName, critereIndex, critereName, critereResponse, enseignantName);
+
+               classeIndexStatisticsDTOMap.get(sectionIndex).getSections().put(sectionIndex, newSectionStatisticDTO);
+           }
+
+       } else {
+           ClasseIndexStatisticsDTO newClasseIndexStatisticsDTO = createEmptyClasseIndex(classeIndex, classeName, sectionIndex, sectionName, questionIndex, questionName, critereIndex, critereName, critereResponse, enseignantName);
+
+           classeIndexStatisticsDTOMap.put(classeIndex, newClasseIndexStatisticsDTO);
+       }
+
+
+        return classeIndexStatisticsDTOMap;
+    }
+
     public SectionStatisticDTO createEmptySection(String sectionIndex, String sectionName, String questionIndex, String questionText, String critereIndex, String critereName, String critereResponse, String enseignantName) {
         SectionStatisticDTO newSectionStatisticDTO = new SectionStatisticDTO();
         newSectionStatisticDTO.setSectionIndex(sectionIndex);
@@ -385,5 +467,33 @@ public class SoumissionController {
         newCritereStatisticDTO.getResponses().put(critereResponse, 1);
 
         return newCritereStatisticDTO;
+    }
+
+    public ClasseIndexStatisticsDTO createEmptyClasseIndex(Long classeIndex, String classeName, String sectionIndex, String sectionName, String questionIndex, String questionText, String critereIndex, String critereName, String critereResponse, String enseignantName) {
+
+        ClasseIndexStatisticsDTO newClasseIndexStatisticsDTO = new ClasseIndexStatisticsDTO();
+        newClasseIndexStatisticsDTO.setClasseIndex(classeIndex);
+        newClasseIndexStatisticsDTO.setClasseName(classeName);
+
+        SectionStatisticDTO newSectionStatisticDTO = new SectionStatisticDTO();
+        newSectionStatisticDTO.setSectionIndex(sectionIndex);
+        newSectionStatisticDTO.setSectionName(sectionName);
+        newSectionStatisticDTO.setClasseName(classeName);
+        newSectionStatisticDTO.setEnseignantName(enseignantName);
+        newClasseIndexStatisticsDTO.getSections().put(sectionIndex, newSectionStatisticDTO);
+
+        QuestionStatisticDTO newQuestionStatisticDTO = new QuestionStatisticDTO();
+        newQuestionStatisticDTO.setQuestionText(questionText);
+        newQuestionStatisticDTO.setQuestionIndex(questionIndex);
+        newSectionStatisticDTO.getQuestions().put(questionIndex, newQuestionStatisticDTO);
+
+        CritereStatisticDTO newCritereStatisticDTO = new CritereStatisticDTO();
+        newCritereStatisticDTO.setCritereIndex(critereIndex);
+        newCritereStatisticDTO.setTitle(critereName);
+        newCritereStatisticDTO.getResponses().put(critereResponse, 1);
+
+        newQuestionStatisticDTO.getCriteres().put(critereIndex, newCritereStatisticDTO);
+
+        return newClasseIndexStatisticsDTO;
     }
 }
