@@ -37,4 +37,5 @@ public interface UserRepository extends JpaRepository<Utilisateur, Long> {
     @Query("SELECT c from Matiere m join Classe c on m.classe.id = c.id join Utilisateur u on m.enseignant.id = u.id where u.id = :enseignantId")
     List<Classe> getAnneeUniversitaireAndClasseByEnseignantId(@Param("enseignantId") Long enseignantId);
 
+
 }
