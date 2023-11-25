@@ -138,6 +138,28 @@ public class SoumissionController {
         return availableStatisticsList;
     }
 
+    @GetMapping("/getEnseignantSoumissions/{enseignantId}")
+    public List<Soumission> getEnseignantSoumissions(@PathVariable Long enseignantId, @RequestParam String anneeUniversitaire) {
+        List<Classe> enseignantClasses = soumissionRepository.getClassesByEnseignant(enseignantId, anneeUniversitaire);
+        List<Evaluation> evaluations = new ArrayList<>();
+        enseignantClasses.forEach(classe -> {
+            List<Evaluation> retievedEvaluations = soumissionRepository.getEvaluationsByClasse(classe.getId());
+            if (!retievedEvaluations.isEmpty()) {
+                evaluations.addAll(retievedEvaluations);
+            }
+        });
+
+        List<Soumission> soumissionList = new ArrayList<>();
+
+        evaluations.forEach(evaluation -> {
+            List<Soumission> evalSoumissions = soumissionRepository.getSoumissionByEvaluation(evaluation.getId());
+            if (evalSoumissions.size() > 0) {
+                soumissionList.addAll(evalSoumissions);
+            }
+        });
+
+        return soumissionList;
+    }
 
     @GetMapping("/getStatistiquesEnseignantByIdAndAnnee/{enseignantId}")
     public Map<Long, ClasseIndexStatisticsDTO> getStatistiquesEnseignantByIdAndAnnee(@PathVariable Long enseignantId, @RequestParam String anneeUniversitaire) {
