@@ -23,6 +23,8 @@ import sesame.projet_evaluation.repository.UserRepository;
 import sesame.projet_evaluation.utils.ERole;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -43,8 +45,10 @@ public class SoumissionController {
     @Autowired
     private UserRepository userRepository;
 
-    private static final DecimalFormat df = new DecimalFormat("0.00");
+   // private static final DecimalFormat df = new DecimalFormat("0.00");
 
+    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+    DecimalFormat df = (DecimalFormat)nf;
 
     @PostMapping("/save")
     public Soumission save(@RequestBody Soumission soumission) {
@@ -379,6 +383,7 @@ public class SoumissionController {
                 }
 
                 double moyenneSection = totalQuestions / section.getValue().getQuestions().size();
+
                 moyenneCours.setScore(Double.valueOf(df.format(moyenneSection)));
 
                 totalSections += moyenneSection;
