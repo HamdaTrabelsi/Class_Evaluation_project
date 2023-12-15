@@ -38,4 +38,9 @@ public class ClasseController {
     public void delete(@PathVariable("id") Long id){
         classRepository.deleteById(id);
     }
+
+    @GetMapping("/all/{departementId}")
+    private List<Classe> getClasseByDepartement(@PathVariable Long departementId){
+        return classRepository.getClassesByDepartementId(departementId);
+    }
 }

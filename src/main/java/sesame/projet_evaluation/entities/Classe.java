@@ -18,6 +18,9 @@ public class Classe {
 
     private String anneeUniversitaire;
 
+    @ManyToOne
+    private Departement departement;
+
     public Classe() {
     }
 
@@ -43,5 +46,13 @@ public class Classe {
 
     public void setAnneeUniversitaire(String anneeUniversitaire) {
         this.anneeUniversitaire = anneeUniversitaire;
+    }
+
+    public Departement getDepartement() {
+        return departement;
+    }
+
+    public void setDepartement(Departement departement) {
+        this.departement = departement;
     }
 }
