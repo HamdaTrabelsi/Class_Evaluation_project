@@ -41,7 +41,7 @@ public class Utilisateur implements Serializable {
     private Classe classe;
 
     @Size(max = 50)
-    private String firstName;
+    private String firstname;
 
     @Size(max = 50)
     private String lastname;
@@ -77,10 +77,10 @@ public class Utilisateur implements Serializable {
     }
 
 
-    public Utilisateur(String username, String email, String firstName, String lastname, String identifiant, String codePostal, String description, String linkedInUrl, String adresse, String password) {
+    public Utilisateur(String username, String email, String firstname, String lastname, String identifiant, String codePostal, String description, String linkedInUrl, String adresse, String password) {
         this.username = username;
         this.email = email;
-        this.firstName = firstName;
+        this.firstname = firstname;
         this.lastname = lastname;
         this.identifiant = identifiant;
         this.codePostal = codePostal;
@@ -123,11 +123,11 @@ public class Utilisateur implements Serializable {
     }
 
     public String getFirstName() {
-        return firstName;
+        return firstname;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFirstName(String firstname) {
+        this.firstname = firstname;
     }
 
     public String getLastname() {

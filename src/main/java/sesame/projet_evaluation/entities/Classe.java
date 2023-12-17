@@ -3,6 +3,7 @@ package sesame.projet_evaluation.entities;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 @Entity
 public class Classe {
@@ -20,6 +21,12 @@ public class Classe {
 
     @ManyToOne
     private Departement departement;
+
+    private Date dateCreation;
+
+    private String nbEtudiants;
+
+    private String nbEnseignants;
 
     public Classe() {
     }
@@ -55,4 +62,30 @@ public class Classe {
     public void setDepartement(Departement departement) {
         this.departement = departement;
     }
+
+    public Date getDateCreation() {
+        return dateCreation;
+    }
+
+    public void setDateCreation(Date dateCreation) {
+        this.dateCreation = dateCreation;
+    }
+
+    public String getNbEtudiants() {
+        return nbEtudiants;
+    }
+
+    public void setNbEtudiants(String nbEtudiants) {
+        this.nbEtudiants = nbEtudiants;
+    }
+
+    public String getNbEnseignants() {
+        return nbEnseignants;
+    }
+
+    public void setNbEnseignants(String nbEnseignants) {
+        this.nbEnseignants = nbEnseignants;
+    }
+
+
 }

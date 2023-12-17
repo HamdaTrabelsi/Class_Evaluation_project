@@ -20,6 +20,14 @@ public class Departement {
     @Column(length = 2000)
     private String description;
 
+    private String adminName;
+
+    private String nbEtudiants;
+
+    private String ngEnseignants;
+
+    private String nbClasses;
+
     public Long getId() {
         return id;
     }
@@ -42,5 +50,37 @@ public class Departement {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAdminName() {
+        return adminName;
+    }
+
+    public void setAdminName(String adminName) {
+        this.adminName = adminName;
+    }
+
+    public String getNbEtudiants() {
+        return nbEtudiants;
+    }
+
+    public void setNbEtudiants(String nbEtudiants) {
+        this.nbEtudiants = nbEtudiants;
+    }
+
+    public String getNgEnseignants() {
+        return ngEnseignants;
+    }
+
+    public void setNgEnseignants(String ngEnseignants) {
+        this.ngEnseignants = ngEnseignants;
+    }
+
+    public String getNbClasses() {
+        return nbClasses;
+    }
+
+    public void setNbClasses(String nbClasses) {
+        this.nbClasses = nbClasses;
     }
 }

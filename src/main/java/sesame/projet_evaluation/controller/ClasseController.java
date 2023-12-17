@@ -9,6 +9,7 @@ import sesame.projet_evaluation.entities.Departement;
 import sesame.projet_evaluation.repository.ClassRepository;
 import sesame.projet_evaluation.repository.DepartementRepository;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -30,6 +31,7 @@ public class ClasseController {
         if(classRepository.existsClasseByAnneeUniversitaireAndNom(anneeUniversitaire, name)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Classe already exists");
         } else {
+            classe.setDateCreation(new Date());
             Classe savedClass = classRepository.save(classe);
             return ResponseEntity.status(HttpStatus.OK).body(savedClass);        }
     }
