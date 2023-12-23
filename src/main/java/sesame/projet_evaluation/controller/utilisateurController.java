@@ -162,6 +162,26 @@ public class utilisateurController {
         }
     }
 
+    @GetMapping("/getCountStats")
+    private HashMap<String,Integer> getCountStats(){
+        HashMap<String, Integer> countbyRole = new HashMap<>();
+        Integer nbAdmin = userRepository.countUsersByRole(ERole.ROLE_ADMIN);
+        Integer nbEnseignants = userRepository.countUsersByRole(ERole.ROLE_ENSEIGNANT);
+        Integer nbEtudiants = userRepository.countUsersByRole(ERole.ROLE_ETUDIANT);
+        Integer nbUsers = userRepository.countUsers();
+        Integer nbClasses = userRepository.countClasses();
+        Integer nbMatieres = userRepository.countMatiere();
+        countbyRole.put("admin", nbAdmin);
+        countbyRole.put("enseignant", nbEnseignants);
+        countbyRole.put("etudiant", nbEtudiants);
+        countbyRole.put("users", nbUsers);
+        countbyRole.put("classes", nbClasses);
+        countbyRole.put("matieres", nbMatieres);
+        return countbyRole;
+    }
+
+
+
     private Utilisateur updateUserByExcel(SignUpRequest signUpRequest, Utilisateur utilisateur, Classe classe) {
         utilisateur.setFirstName(signUpRequest.getFirstname());
         utilisateur.setLastname(signUpRequest.getLastname());

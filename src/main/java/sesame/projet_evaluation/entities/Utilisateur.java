@@ -40,8 +40,10 @@ public class Utilisateur implements Serializable {
     @JoinColumn(columnDefinition="integer", name="classe_id")
     private Classe classe;
 
+    @Column(name="first_name")
     @Size(max = 50)
     private String firstname;
+
 
     @Size(max = 50)
     private String lastname;

@@ -37,4 +37,7 @@ public interface SoumissionRepository extends JpaRepository<Soumission, Long> {
 
     @Query("select s from Soumission s where s.evaluation.classe.id = :classeId")
     public List<Soumission> getSoumissionByClasse(@Param("classeId") Long classeId);
+
+    @Query("select s from Soumission s order by s.dateCreation")
+    public List<Soumission> getSoumissionByDate();
 }

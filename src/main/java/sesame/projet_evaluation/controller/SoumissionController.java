@@ -10,6 +10,7 @@ import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneCours;
 import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneEval;
 import sesame.projet_evaluation.entities.MoyenneClasses.MoyenneFormation;
 import sesame.projet_evaluation.entities.Soumission;
+import sesame.projet_evaluation.entities.Utilisateur;
 import sesame.projet_evaluation.entities.enseignantClasses.AvailableStatistics;
 import sesame.projet_evaluation.entities.utilityClasses.Critere;
 import sesame.projet_evaluation.entities.utilityClasses.Formulaire;
@@ -83,7 +84,9 @@ public class SoumissionController {
             for (Section s : f.getSections()) {
                 for (Question q : s.getQuestions()) {
                     for (Critere c : q.getCriteres()) {
-                        sectionStatisticDTOS = addToStats(s.getSectionId(), s.getSectionName(), q.getQuestionIndex(), q.getQuestionText(), c.getCritereIndex(), c.getTitre(), c.getReponse(), sectionStatisticDTOS, s.getEnseignantName());
+                        Utilisateur enseignant = userRepository.findById(s.getEnseignantId()).get();
+                        String enseignantName = enseignant.getLastname() + " " + enseignant.getFirstName();
+                        sectionStatisticDTOS = addToStats(s.getSectionId(), s.getSectionName(), q.getQuestionIndex(), q.getQuestionText(), c.getCritereIndex(), c.getTitre(), c.getReponse(), sectionStatisticDTOS, enseignantName);
                     }
                 }
             }
@@ -199,7 +202,9 @@ public class SoumissionController {
                 }
                 for (Question q : s.getQuestions()) {
                     for (Critere c : q.getCriteres()) {
-                        classeIndexStatisticsDTOMap = addToStatsEnseignant(s.getClasseId(), s.getClasseName(), s.getSectionId(), s.getSectionName(), q.getQuestionIndex(), q.getQuestionText(), c.getCritereIndex(), c.getTitre(), c.getReponse(), classeIndexStatisticsDTOMap, s.getEnseignantName());
+                        Utilisateur enseignant = userRepository.findById(s.getEnseignantId()).get();
+                        String enseignantName = enseignant.getLastname() + " " + enseignant.getFirstName();
+                        classeIndexStatisticsDTOMap = addToStatsEnseignant(s.getClasseId(), s.getClasseName(), s.getSectionId(), s.getSectionName(), q.getQuestionIndex(), q.getQuestionText(), c.getCritereIndex(), c.getTitre(), c.getReponse(), classeIndexStatisticsDTOMap, enseignantName);
                     }
                 }
             }
@@ -234,6 +239,11 @@ public class SoumissionController {
         return formations;
     }
 
+    @GetMapping("/getSoumissionByDate")
+    public List<Soumission> getSoumissionByDate() {
+        return this.soumissionRepository.getSoumissionByDate();
+    }
+
     public List<MoyenneFormation> calculateMoyenneEnseignant(List<Soumission> soumissionList, Long enseignantId) {
         List<MoyenneFormation> moyenneFormationList = new ArrayList<>();
 
@@ -246,7 +256,9 @@ public class SoumissionController {
                 }
                 for (Question question : section.getQuestions()) {
                     for (Critere critere : question.getCriteres()) {
-                        classeIndexStatisticsDTOMap = addToStatsEnseignant(section.getClasseId(), section.getClasseName(), section.getSectionId(), section.getSectionName(), question.getQuestionIndex(), question.getQuestionText(), critere.getCritereIndex(), critere.getTitre(), critere.getReponse(), classeIndexStatisticsDTOMap, section.getEnseignantName());
+                        Utilisateur enseignant = userRepository.findById(section.getEnseignantId()).get();
+                        String enseignantName = enseignant.getLastname() + " " + enseignant.getFirstName();
+                        classeIndexStatisticsDTOMap = addToStatsEnseignant(section.getClasseId(), section.getClasseName(), section.getSectionId(), section.getSectionName(), question.getQuestionIndex(), question.getQuestionText(), critere.getCritereIndex(), critere.getTitre(), critere.getReponse(), classeIndexStatisticsDTOMap, enseignantName);
                     }
                 }
             }
@@ -324,7 +336,9 @@ public class SoumissionController {
             for (Section section : soumission.getFormulaire().getSections()) {
                 for (Question question : section.getQuestions()) {
                     for (Critere critere : question.getCriteres()) {
-                        sectionStatisticDTOS = addToStats(section.getSectionId(), section.getSectionName(), question.getQuestionIndex(), question.getQuestionText(), critere.getCritereIndex(), critere.getTitre(), critere.getReponse(), sectionStatisticDTOS, section.getEnseignantName());
+                        Utilisateur enseignant = userRepository.findById(section.getEnseignantId()).get();
+                        String enseignantName = enseignant.getLastname() + " " + enseignant.getFirstName();
+                        sectionStatisticDTOS = addToStats(section.getSectionId(), section.getSectionName(), question.getQuestionIndex(), question.getQuestionText(), critere.getCritereIndex(), critere.getTitre(), critere.getReponse(), sectionStatisticDTOS, enseignantName);
                     }
                 }
             }
@@ -540,7 +554,6 @@ public class SoumissionController {
             } else {
                 SectionStatisticDTO newSectionStatisticDTO = createEmptySection(sectionIndex, sectionName, questionIndex, questionName, critereIndex, critereName, critereResponse, enseignantName);
 
-                System.out.println(sectionIndex);
                 classeIndexStatisticsDTOMap.get(classeIndex).getSections().put(sectionIndex, newSectionStatisticDTO);
             }
 

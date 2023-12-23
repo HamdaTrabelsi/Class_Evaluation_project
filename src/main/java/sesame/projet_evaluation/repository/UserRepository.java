@@ -10,6 +10,7 @@ import sesame.projet_evaluation.entities.Evaluation;
 import sesame.projet_evaluation.entities.Utilisateur;
 import sesame.projet_evaluation.utils.ERole;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,5 +45,17 @@ public interface UserRepository extends JpaRepository<Utilisateur, Long> {
     @Query("SELECT c from Matiere m join Classe c on m.classe.id = c.id join Utilisateur u on m.enseignant.id = u.id where u.id = :enseignantId")
     List<Classe> getAnneeUniversitaireAndClasseByEnseignantId(@Param("enseignantId") Long enseignantId);
 
+
+    @Query("SELECT Count(u) FROM Utilisateur u JOIN u.roles r WHERE r.name = :roleName")
+    Integer countUsersByRole(@Param("roleName") ERole roleName);
+
+    @Query("SELECT Count(u) FROM Utilisateur u ")
+    Integer countUsers();
+
+    @Query("SELECT Count(u) FROM Classe u ")
+    Integer countClasses();
+
+    @Query("SELECT Count(u) FROM Matiere u ")
+    Integer countMatiere();
 
 }
